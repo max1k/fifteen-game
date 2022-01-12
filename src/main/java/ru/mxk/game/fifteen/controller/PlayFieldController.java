@@ -1,38 +1,23 @@
 package ru.mxk.game.fifteen.controller;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
-import ru.mxk.game.fifteen.component.GameButton;
+import ru.mxk.game.fifteen.component.ValueButton;
+import ru.mxk.game.fifteen.service.FifteenGameService;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class PlayFieldController {
-    private static final int SIZE = 4;
-    private static final int EMPTY_BUTTON_VALUE = SIZE * SIZE;
-    private final GameButton[] buttons = new GameButton[SIZE * SIZE];
-    private final Map<Button, Integer> buttonIndexMap = new HashMap<>(SIZE * SIZE);
-
+    private final FifteenGameService gameService = new FifteenGameService();
     public Pane playField;
 
-    public PlayFieldController() {
-        for(int i = 0; i < SIZE * SIZE; i++) {
-            final GameButton button = new GameButton(i + 1);
-            button.setOnAction(this::handleButtonClick);
-
-            buttons[i] = button;
-            buttonIndexMap.put(button, i);
-
-            if (isEmpty(i)) {
-                button.setVisible(false);
-            }
-        }
-    }
+    private Integer lastSelectedNumber;
 
     @FXML
     public void initialize() {
@@ -40,26 +25,21 @@ public class PlayFieldController {
         playField.widthProperty().addListener((observable, oldValue, newValue) -> refreshField());
     }
 
-    private boolean isEmpty(final int index) {
-        return buttons[index].getValue() == EMPTY_BUTTON_VALUE;
-    }
-
     private void handleButtonClick(final ActionEvent actionEvent) {
-        if (!(actionEvent.getSource() instanceof Button button)) {
+        if (!(actionEvent.getSource() instanceof ValueButton button)) {
             throw new IllegalArgumentException("Unexpected object provided: " + actionEvent.getSource());
         }
 
-        final Integer buttonIndex = buttonIndexMap.get(button);
-        if (buttonIndex != null) {
-            boolean stateIsChanged = trySwap(buttonIndex);
+        lastSelectedNumber = button.getValue();
+        boolean stateIsChanged = gameService.trySwap(lastSelectedNumber);
 
-            if (stateIsChanged) {
-                refreshField();
-                if (checkWin()) {
-                    showMessage("Congratulations!", "You won!");
-                }
+        if (stateIsChanged) {
+            refreshField();
+            if (gameService.checkWin()) {
+                showMessage("Congratulations!", "You won!");
             }
         }
+
     }
 
     private void showMessage(final String header, final String message) {
@@ -67,53 +47,32 @@ public class PlayFieldController {
         alert.setTitle("Game results");
         alert.setHeaderText(header);
         alert.setContentText(message);
-
         alert.showAndWait();
     }
 
-    private boolean checkWin() {
-        int number = 1;
-        for (GameButton button : buttons) {
-            if (button.getValue() != number++) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private boolean trySwap(int buttonIndex) {
-        final Optional<Integer> emptyNeighborIndex =
-                Stream.of(buttonIndex - 1, buttonIndex + 1, buttonIndex - SIZE, buttonIndex + SIZE)
-                      .filter(index -> index >= 0 && index < SIZE * SIZE)
-                      .filter(this::isEmpty)
-                      .findFirst();
-
-        if (emptyNeighborIndex.isPresent()) {
-            swap(buttonIndex, emptyNeighborIndex.get());
-            return true;
-        }
-
-        return false;
-    }
-
-    private void swap(int firstIndex, int secondIndex) {
-        final GameButton temp = buttons[firstIndex];
-        buttons[firstIndex] = buttons[secondIndex];
-        buttons[secondIndex] = temp;
-
-        buttonIndexMap.put(buttons[firstIndex], firstIndex);
-        buttonIndexMap.put(buttons[secondIndex], secondIndex);
-    }
-
     private void refreshField() {
-        for (GameButton button : buttons) {
-            button.setPrefWidth(Math.floor(playField.getWidth() / SIZE));
-            button.setPrefHeight(Math.floor(playField.getHeight() / SIZE));
-        }
+        final List<Button> buttons = gameService.mapCells(this::createButton);
 
-        playField.getChildren().clear();
-        playField.getChildren().addAll(buttons);
+        ObservableList<Node> children = playField.getChildren();
+        children.clear();
+        children.addAll(buttons);
+
+        Optional.ofNullable(lastSelectedNumber)
+                .flatMap(gameService::getIndexByValue)
+                .map(children::get)
+                .ifPresent(Node::requestFocus);
     }
 
+    private ValueButton createButton(int value) {
+        final ValueButton button = new ValueButton(value);
+        button.setOnAction(this::handleButtonClick);
+        button.setPrefWidth(Math.floor(playField.getWidth() / gameService.getSize()));
+        button.setPrefHeight(Math.floor(playField.getHeight() / gameService.getSize()));
+        gameService.getIndexByValue(value)
+                   .map(gameService::isEmpty)
+                   .map(it -> !it)
+                   .ifPresent(button::setVisible);
+
+        return button;
+    }
 }

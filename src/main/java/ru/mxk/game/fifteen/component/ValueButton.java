@@ -4,10 +4,10 @@ import javafx.scene.control.Button;
 import lombok.Getter;
 
 @Getter
-public class GameButton extends Button {
+public class ValueButton extends Button {
     private final int value;
 
-    public GameButton(int value) {
+    public ValueButton(int value) {
         super(String.valueOf(value));
         this.value = value;
     }
