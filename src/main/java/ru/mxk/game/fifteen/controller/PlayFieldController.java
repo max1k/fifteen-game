@@ -7,14 +7,17 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.mxk.game.fifteen.component.ValueButton;
 import ru.mxk.game.fifteen.service.FifteenGameService;
 
 import java.util.List;
 import java.util.Optional;
 
+
 public class PlayFieldController {
-    private final FifteenGameService gameService = new FifteenGameService();
+    @Autowired
+    private FifteenGameService gameService;
     public Pane playField;
 
     private Integer lastSelectedNumber;
@@ -69,9 +72,9 @@ public class PlayFieldController {
         button.setPrefWidth(Math.floor(playField.getWidth() / gameService.getSize()));
         button.setPrefHeight(Math.floor(playField.getHeight() / gameService.getSize()));
         gameService.getIndexByValue(value)
-                   .map(gameService::isEmpty)
-                   .map(it -> !it)
-                   .ifPresent(button::setVisible);
+                .map(gameService::isEmpty)
+                .map(it -> !it)
+                .ifPresent(button::setVisible);
 
         return button;
     }

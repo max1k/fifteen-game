@@ -1,5 +1,7 @@
 package ru.mxk.game.fifteen.service;
 
+import org.springframework.stereotype.Service;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Service
 public class FifteenGameService {
     private static final int SIZE = 5;
     private static final int EMPTY_CELL_VALUE = SIZE * SIZE;
