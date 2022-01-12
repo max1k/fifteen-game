@@ -18,7 +18,8 @@ import java.util.Optional;
 public class PlayFieldController {
     @Autowired
     private FifteenGameService gameService;
-    public Pane playField;
+    @FXML
+    private Pane playField;
 
     private Integer lastSelectedNumber;
 
