@@ -1,4 +1,4 @@
-package ru.mxk.game.fifteen.service;
+package ru.mxk.game.fifteen.component.gameplay;
 
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class FifteenGameService {
+public class GameplayService {
     private static final int SIZE = 5;
     private static final int EMPTY_CELL_VALUE = SIZE * SIZE;
 
@@ -20,7 +20,7 @@ public class FifteenGameService {
     private final Map<Integer, Integer> valueIndexMap = new HashMap<>(SIZE * SIZE);
 
 
-    public FifteenGameService() {
+    public GameplayService() {
         for(int i = 0; i < SIZE * SIZE; i++) {
             final int cellValue = i + 1;
             cells[i] = cellValue;

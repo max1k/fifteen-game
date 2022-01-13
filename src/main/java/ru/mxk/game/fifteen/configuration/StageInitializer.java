@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 public record StageInitializer(GenericApplicationContext context) implements ApplicationListener<StageReadyEvent> {
     @Override
     public void onApplicationEvent(StageReadyEvent event) {
-        context.registerBean("myBean", Stage.class, event::getStage);
+        context.registerBean(Stage.class, event::getStage);
     }
 }

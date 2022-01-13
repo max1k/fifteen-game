@@ -1,4 +1,4 @@
-package ru.mxk.game.fifteen.controller;
+package ru.mxk.game.fifteen.component.gameplay;
 
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -8,16 +8,17 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.mxk.game.fifteen.component.ValueButton;
-import ru.mxk.game.fifteen.service.FifteenGameService;
+import ru.mxk.game.fifteen.base.BaseController;
+import ru.mxk.game.fifteen.configuration.JavaFXController;
+import ru.mxk.game.fifteen.fx_component.ValueButton;
 
 import java.util.List;
 import java.util.Optional;
 
-
-public class PlayFieldController {
+@JavaFXController("gameplay-view.fxml")
+public class GameplayController extends BaseController {
     @Autowired
-    private FifteenGameService gameService;
+    private GameplayService gameService;
     @FXML
     private Pane playField;
 
@@ -40,17 +41,17 @@ public class PlayFieldController {
         if (stateIsChanged) {
             refreshField();
             if (gameService.checkWin()) {
-                showMessage("Congratulations!", "You won!");
+                showWinMessage();
             }
         }
 
     }
 
-    private void showMessage(final String header, final String message) {
+    private void showWinMessage() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Game results");
-        alert.setHeaderText(header);
-        alert.setContentText(message);
+        alert.setHeaderText("Congratulations!");
+        alert.setContentText("You won!");
         alert.showAndWait();
     }
 

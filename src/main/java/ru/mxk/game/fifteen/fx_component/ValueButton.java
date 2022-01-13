@@ -1,4 +1,4 @@
-package ru.mxk.game.fifteen.component;
+package ru.mxk.game.fifteen.fx_component;
 
 import javafx.scene.control.Button;
 import lombok.Getter;
