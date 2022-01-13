@@ -1,35 +1,66 @@
 package ru.mxk.game.fifteen.component.gameplay;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.mxk.game.fifteen.configuration.GameOptions;
 
+import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
+@AllArgsConstructor
 public class GameplayService {
-    private static final int SIZE = 5;
-    private static final int EMPTY_CELL_VALUE = SIZE * SIZE;
+    private final GameOptions options;
 
-    private final int[] cells = new int[SIZE * SIZE];
-    private final Map<Integer, Integer> valueIndexMap = new HashMap<>(SIZE * SIZE);
+    private int[] cells;
+    private Map<Integer, Integer> valueIndexMap;
+
+    @PostConstruct
+    private void init() {
+        cells = new int[getCellsCount()];
+        valueIndexMap = new HashMap<>(getCellsCount());
+
+        reset();
+        shuffle();
+    }
 
 
-    public GameplayService() {
-        for(int i = 0; i < SIZE * SIZE; i++) {
+
+    public int getSize() {
+        return options.getSize();
+    }
+
+    private int getCellsCount() {
+        return options.getSize() * options.getSize();
+    }
+
+    private void reset() {
+        for(int i = 0; i < getCellsCount(); i++) {
             final int cellValue = i + 1;
             cells[i] = cellValue;
             valueIndexMap.put(cellValue, i);
         }
     }
 
-    public int getSize() {
-        return SIZE;
+    private void shuffle() {
+        for(int i = 0; i < getSize() * getSize() * getSize(); i++) {
+            final int emptyCellIdx = valueIndexMap.get(getCellsCount());
+            final List<Integer> neighborCells =
+                    Stream.of(emptyCellIdx - 1, emptyCellIdx + 1, emptyCellIdx - getSize(), emptyCellIdx + getSize())
+                          .filter(index -> index >= 0 && index < getCellsCount())
+                          .map(index -> cells[index])
+                          .collect(Collectors.toList());
+            final int randomNeighborValue =  neighborCells.get(new Random().nextInt(neighborCells.size()));
+            trySwap(randomNeighborValue);
+        }
     }
 
     public Optional<Integer> getIndexByValue(final int value) {
@@ -37,15 +68,15 @@ public class GameplayService {
     }
 
     public boolean isEmpty(final int index) {
-        return cells[index] == EMPTY_CELL_VALUE;
+        return cells[index] == getCellsCount();
     }
 
     public boolean trySwap(int cellValue) {
         final int cellIndex = getIndexByValue(cellValue).orElseThrow(() -> new IndexOutOfBoundsException(cellValue));
 
         final Optional<Integer> emptyNeighborIndex =
-                Stream.of(cellIndex - 1, cellIndex + 1, cellIndex - SIZE, cellIndex + SIZE)
-                      .filter(index -> index >= 0 && index < SIZE * SIZE)
+                Stream.of(cellIndex - 1, cellIndex + 1, cellIndex - getSize(), cellIndex + getSize())
+                      .filter(index -> index >= 0 && index < getCellsCount())
                       .filter(this::isEmpty)
                       .findFirst();
 

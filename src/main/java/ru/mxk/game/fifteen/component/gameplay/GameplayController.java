@@ -19,11 +19,11 @@ import java.util.Optional;
 public class GameplayController extends BaseController {
     @Autowired
     private GameplayService gameService;
-
     @FXML
     private Pane playField;
 
     private Integer lastSelectedNumber;
+
 
     @FXML
     public void initialize() {

@@ -6,6 +6,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BaseController {
+public abstract class BaseController {
     private Parent content;
 }

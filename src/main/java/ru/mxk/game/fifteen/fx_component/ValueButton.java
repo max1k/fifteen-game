@@ -7,6 +7,7 @@ import lombok.Getter;
 public class ValueButton extends Button {
     private final int value;
 
+
     public ValueButton(int value) {
         super(String.valueOf(value));
         this.value = value;
