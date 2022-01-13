@@ -1,4 +1,4 @@
-package ru.mxk.game.fifteen.configuration;
+package ru.mxk.game.fifteen.configuration.annotation;
 
 import org.springframework.stereotype.Component;
 
@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Component
 public @interface JavaFXController {
-    String value() default "";
+    String value();
 }

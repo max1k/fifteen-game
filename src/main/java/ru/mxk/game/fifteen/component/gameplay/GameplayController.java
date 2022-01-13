@@ -9,7 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.mxk.game.fifteen.base.BaseController;
-import ru.mxk.game.fifteen.configuration.JavaFXController;
+import ru.mxk.game.fifteen.configuration.annotation.JavaFXController;
 import ru.mxk.game.fifteen.fx_component.ValueButton;
 
 import java.util.List;
@@ -19,6 +19,7 @@ import java.util.Optional;
 public class GameplayController extends BaseController {
     @Autowired
     private GameplayService gameService;
+
     @FXML
     private Pane playField;
 
@@ -36,7 +37,7 @@ public class GameplayController extends BaseController {
         }
 
         lastSelectedNumber = button.getValue();
-        boolean stateIsChanged = gameService.trySwap(lastSelectedNumber);
+        final boolean stateIsChanged = gameService.trySwap(lastSelectedNumber);
 
         if (stateIsChanged) {
             refreshField();
@@ -48,7 +49,7 @@ public class GameplayController extends BaseController {
     }
 
     private void showWinMessage() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        final Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Game results");
         alert.setHeaderText("Congratulations!");
         alert.setContentText("You won!");
@@ -58,7 +59,7 @@ public class GameplayController extends BaseController {
     private void refreshField() {
         final List<Button> buttons = gameService.mapCells(this::createButton);
 
-        ObservableList<Node> children = playField.getChildren();
+        final ObservableList<Node> children = playField.getChildren();
         children.clear();
         children.addAll(buttons);
 
