@@ -32,8 +32,6 @@ public class GameplayService {
         shuffle();
     }
 
-
-
     public int getSize() {
         return options.getSize();
     }
@@ -42,7 +40,7 @@ public class GameplayService {
         return options.getSize() * options.getSize();
     }
 
-    private void reset() {
+    public void reset() {
         for(int i = 0; i < getCellsCount(); i++) {
             final int cellValue = i + 1;
             cells[i] = cellValue;
@@ -50,7 +48,7 @@ public class GameplayService {
         }
     }
 
-    private void shuffle() {
+    public void shuffle() {
         for(int i = 0; i < getSize() * getSize() * getSize(); i++) {
             final int emptyCellIdx = valueIndexMap.get(getCellsCount());
             final List<Integer> neighborCells =
