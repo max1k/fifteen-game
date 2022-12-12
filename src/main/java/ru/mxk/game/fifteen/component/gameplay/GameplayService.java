@@ -52,10 +52,10 @@ public class GameplayService {
         for(int i = 0; i < getSize() * getSize() * getSize(); i++) {
             final int emptyCellIdx = valueIndexMap.get(getCellsCount());
             final List<Integer> neighborCells =
-                    Stream.of(emptyCellIdx - 1, emptyCellIdx + 1, emptyCellIdx - getSize(), emptyCellIdx + getSize())
-                          .filter(index -> index >= 0 && index < getCellsCount())
-                          .map(index -> cells[index])
-                          .collect(Collectors.toList());
+                    getNeighborCellsIndexes(emptyCellIdx)
+                            .map(index -> cells[index])
+                            .collect(Collectors.toList());
+
             final int randomNeighborValue =  neighborCells.get(new Random().nextInt(neighborCells.size()));
             trySwap(randomNeighborValue);
         }
@@ -73,10 +73,9 @@ public class GameplayService {
         final int cellIndex = getIndexByValue(cellValue).orElseThrow(() -> new IndexOutOfBoundsException(cellValue));
 
         final Optional<Integer> emptyNeighborIndex =
-                Stream.of(cellIndex - 1, cellIndex + 1, cellIndex - getSize(), cellIndex + getSize())
-                      .filter(index -> index >= 0 && index < getCellsCount())
-                      .filter(this::isEmpty)
-                      .findFirst();
+                getNeighborCellsIndexes(cellIndex)
+                        .filter(this::isEmpty)
+                        .findFirst();
 
         if (emptyNeighborIndex.isPresent()) {
             swap(cellIndex, emptyNeighborIndex.get());
@@ -84,6 +83,12 @@ public class GameplayService {
         }
 
         return false;
+    }
+
+    private Stream<Integer> getNeighborCellsIndexes(final int cellIndex) {
+        return Stream.of(cellIndex - 1, cellIndex + 1, cellIndex - getSize(), cellIndex + getSize())
+                .filter(index -> index >= 0)
+                .filter(index -> index < getCellsCount());
     }
 
     private void swap(int firstIndex, int secondIndex) {
